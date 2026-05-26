@@ -20,13 +20,12 @@ namespace ConsoleApp15.Helpers
             Console.WriteLine("  --whoami                       Текущий пользователь");
             Console.WriteLine("  --addNewNote \"текст\"          Создать заметку");
             Console.WriteLine("  --listNotes                    Список заметок");
-            Console.WriteLine("  --deleteNote <id>              Удалить заметку");
+            Console.WriteLine("  --deleteNote <id>              Удалить заметку (админ)");
             Console.WriteLine("  --editNote <id> \"текст\"       Редактировать заметку");
             Console.WriteLine("  --stats                        Метрики системы");
             Console.WriteLine("  --statsWatch <сек>             Мониторинг каждые N сек");
             Console.WriteLine("  --securityLogs                 Логи безопасности");
             Console.WriteLine("  --adminUsers                   Список пользователей (админ)");
-            Console.WriteLine("  --adminDeleteNote <uid> <nid>  Удалить заметку (админ)");
             Console.WriteLine("  --adminDeleteUser <uid>        Удалить пользователя (админ)");
             Console.WriteLine("  --adminCreateAdmin <user>      Назначить админа (админ)");
             Console.WriteLine("  --checkUpdate                  Проверить обновления");
@@ -50,7 +49,7 @@ namespace ConsoleApp15.Helpers
             Console.WriteLine("|---------|----------|--------|");
             Console.WriteLine("| `--addNewNote \"текст\"` | Создать заметку | `--addNewNote \"Новая заметка\"` |");
             Console.WriteLine("| `--listNotes` | Список заметок | `--listNotes` |");
-            Console.WriteLine("| `--deleteNote <id>` | Удалить заметку | `--deleteNote 3` |");
+            Console.WriteLine("| `--deleteNote <id>` | Удалить заметку (админ) | `--deleteNote 3` |");
             Console.WriteLine("| `--editNote <id> \"текст\"` | Редактировать | `--editNote 3 \"Новый текст\"` |");
             Console.WriteLine();
             Console.WriteLine("## Мониторинг");
@@ -69,7 +68,6 @@ namespace ConsoleApp15.Helpers
             Console.WriteLine("| Команда | Описание | Пример |");
             Console.WriteLine("|---------|----------|--------|");
             Console.WriteLine("| `--adminUsers` | Список пользователей | `--adminUsers` |");
-            Console.WriteLine("| `--adminDeleteNote <uid> <nid>` | Удалить заметку пользователя | `--adminDeleteNote 2 5` |");
             Console.WriteLine("| `--adminDeleteUser <uid>` | Удалить пользователя | `--adminDeleteUser 3` |");
             Console.WriteLine("| `--adminCreateAdmin <user>` | Назначить админом | `--adminCreateAdmin bob` |");
             Console.WriteLine();

@@ -119,7 +119,6 @@ namespace ConsoleApp15.Helpers
                 "--statswatch" => CommandType.StatsWatch,
                 "--securitylogs" => CommandType.SecurityLogs,
                 "--adminusers" => CommandType.AdminUsers,
-                "--admindeletenote" => CommandType.AdminDeleteNote,
                 "--admindeleteuser" => CommandType.AdminDeleteUser,
                 "--admincreateadmin" => CommandType.AdminCreateAdmin,
                 "--checkupdate" => CommandType.CheckUpdate,

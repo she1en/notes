@@ -67,18 +67,19 @@ namespace ConsoleApp15.Services
         public (bool success, string message) DeleteNote(int noteId)
         {
             var session = RequireSession();
+            if (session.Role != "admin")
+                return (false, "Admin privileges required.");
 
             using var conn = _db.CreateConnection();
             conn.Open();
 
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "DELETE FROM notes WHERE Id = @id AND UserId = @uid";
+            cmd.CommandText = "DELETE FROM notes WHERE Id = @id";
             cmd.Parameters.AddWithValue("@id", noteId);
-            cmd.Parameters.AddWithValue("@uid", session.UserId);
 
             var affected = cmd.ExecuteNonQuery();
             if (affected == 0)
-                return (false, $"Note #{noteId} not found or not owned by you.");
+                return (false, $"Note #{noteId} not found.");
 
             _logger.Log(session.Username, "deleteNote", "success", $"id={noteId}");
             return (true, $"Note #{noteId} deleted.");
@@ -140,30 +141,5 @@ namespace ConsoleApp15.Services
             return (notes, notes.Count > 0 ? $"{notes.Count} note(s) found." : "No notes.");
         }
 
-        public (bool success, string message) AdminDeleteNote(int noteId)
-        {
-            var session = RequireSession();
-            if (session.Role != "admin")
-                return (false, "Admin privileges required.");
-
-            using var conn = _db.CreateConnection();
-            conn.Open();
-
-            using var getCmd = conn.CreateCommand();
-            getCmd.CommandText = "SELECT Username FROM notes WHERE Id = @id";
-            getCmd.Parameters.AddWithValue("@id", noteId);
-            var owner = getCmd.ExecuteScalar() as string;
-
-            using var delCmd = conn.CreateCommand();
-            delCmd.CommandText = "DELETE FROM notes WHERE Id = @id";
-            delCmd.Parameters.AddWithValue("@id", noteId);
-
-            var affected = delCmd.ExecuteNonQuery();
-            if (affected == 0)
-                return (false, $"Note #{noteId} not found.");
-
-            _logger.Log(session.Username, "adminDeleteNote", "success", $"noteId={noteId}, owner={owner}");
-            return (true, $"Note #{noteId} deleted by admin.");
-        }
     }
 }

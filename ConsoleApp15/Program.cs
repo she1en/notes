@@ -96,10 +96,6 @@ namespace ConsoleApp15
                         HandleAdminUsers();
                         break;
 
-                    case CommandType.AdminDeleteNote:
-                        HandleAdminDeleteNote(parsedArgs);
-                        break;
-
                     case CommandType.AdminDeleteUser:
                         HandleAdminDeleteUser(parsedArgs);
                         break;
@@ -214,9 +210,6 @@ namespace ConsoleApp15
                     break;
                 case CommandType.AdminUsers:
                     HandleAdminUsers();
-                    break;
-                case CommandType.AdminDeleteNote:
-                    HandleAdminDeleteNote(parsedArgs);
                     break;
                 case CommandType.AdminDeleteUser:
                     HandleAdminDeleteUser(parsedArgs);
@@ -393,25 +386,6 @@ namespace ConsoleApp15
             Console.WriteLine();
             foreach (var u in users)
                 Console.WriteLine($"#{u.Id} | {u.Username} | {u.Role} | {u.CreatedAt:yyyy-MM-dd HH:mm}");
-        }
-
-        static void HandleAdminDeleteNote(CommandArgs args)
-        {
-            var session = Auth.GetCurrentSession();
-            if (!session.IsActive || session.Role != "admin")
-            {
-                Console.WriteLine("Admin privileges required.");
-                return;
-            }
-
-            if (args.Arguments.Count < 2 || !int.TryParse(args.Arguments[1], out var noteId))
-            {
-                Console.WriteLine("Usage: --adminDeleteNote <userId> <noteId>");
-                return;
-            }
-
-            var (success, message) = Notes.AdminDeleteNote(noteId);
-            Console.WriteLine(success ? $"OK: {message}" : $"Error: {message}");
         }
 
         static void HandleAdminDeleteUser(CommandArgs args)

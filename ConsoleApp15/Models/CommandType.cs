@@ -17,7 +17,7 @@ namespace ConsoleApp15.Models
         StatsWatch,
         SecurityLogs,
         AdminUsers,
-        AdminDeleteNote,
+
         AdminDeleteUser,
         AdminCreateAdmin,
         CheckUpdate,
