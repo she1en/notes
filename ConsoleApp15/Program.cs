@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using ConsoleApp15.Helpers;
 using ConsoleApp15.Models;
 using ConsoleApp15.Services;
@@ -8,49 +9,73 @@ namespace ConsoleApp15
     class Program
     {
         private static readonly AuthService Auth = new AuthService();
+        private static readonly NoteService Notes = new NoteService();
 
         static void Main(string[] args)
         {
             var parsedArgs = CommandParser.Parse(args);
 
-            switch (parsedArgs.Command)
+            try
             {
-                case CommandType.Help:
-                    HelpGenerator.ShowHelp();
-                    break;
+                switch (parsedArgs.Command)
+                {
+                    case CommandType.Help:
+                        HelpGenerator.ShowHelp();
+                        break;
 
-                case CommandType.Map:
-                    HelpGenerator.ShowMap();
-                    break;
+                    case CommandType.Map:
+                        HelpGenerator.ShowMap();
+                        break;
 
-                case CommandType.Version:
-                    Console.WriteLine($"{AppVersion.AppName} v{AppVersion.Version}");
-                    break;
+                    case CommandType.Version:
+                        Console.WriteLine($"{AppVersion.AppName} v{AppVersion.Version}");
+                        break;
 
-                case CommandType.Register:
-                    HandleRegister(parsedArgs);
-                    break;
+                    case CommandType.Register:
+                        HandleRegister(parsedArgs);
+                        break;
 
-                case CommandType.Login:
-                    HandleLogin(parsedArgs);
-                    break;
+                    case CommandType.Login:
+                        HandleLogin(parsedArgs);
+                        break;
 
-                case CommandType.Logout:
-                    HandleLogout();
-                    break;
+                    case CommandType.Logout:
+                        HandleLogout();
+                        break;
 
-                case CommandType.WhoAmI:
-                    HandleWhoAmI();
-                    break;
+                    case CommandType.WhoAmI:
+                        HandleWhoAmI();
+                        break;
 
-                case CommandType.Unknown:
-                    Console.WriteLine($"Unknown command: {string.Join(" ", args)}");
-                    Console.WriteLine("Use --help to see available commands.");
-                    break;
+                    case CommandType.AddNewNote:
+                        HandleAddNote(parsedArgs);
+                        break;
 
-                default:
-                    Console.WriteLine($"Command '{args[0]}' is not implemented yet (coming soon).");
-                    break;
+                    case CommandType.ListNotes:
+                        HandleListNotes();
+                        break;
+
+                    case CommandType.DeleteNote:
+                        HandleDeleteNote(parsedArgs);
+                        break;
+
+                    case CommandType.EditNote:
+                        HandleEditNote(parsedArgs);
+                        break;
+
+                    case CommandType.Unknown:
+                        Console.WriteLine($"Unknown command: {string.Join(" ", args)}");
+                        Console.WriteLine("Use --help to see available commands.");
+                        break;
+
+                    default:
+                        Console.WriteLine($"Command '{args[0]}' is not implemented yet (coming soon).");
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
             }
         }
 
@@ -103,6 +128,73 @@ namespace ConsoleApp15
             Console.WriteLine($"User: {session.Username}");
             Console.WriteLine($"Role: {session.Role}");
             Console.WriteLine($"Logged in: {session.LoginTime:yyyy-MM-dd HH:mm:ss}");
+        }
+
+        static void HandleAddNote(CommandArgs args)
+        {
+            var text = string.Join(" ", args.Arguments);
+            if (string.IsNullOrWhiteSpace(text) && args.Flags.Count > 0)
+                text = args.Flags.Values.FirstOrDefault() ?? "";
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                Console.WriteLine("Usage: --addNewNote \"note text\"");
+                return;
+            }
+
+            var (success, message, _) = Notes.AddNote(text);
+            Console.WriteLine(success ? $"OK: {message}" : $"Error: {message}");
+        }
+
+        static void HandleListNotes()
+        {
+            var (notes, message) = Notes.ListNotes();
+
+            if (notes.Count == 0)
+            {
+                Console.WriteLine(message);
+                return;
+            }
+
+            Console.WriteLine($"=== Notes ({message}) ===");
+            Console.WriteLine();
+            foreach (var note in notes)
+            {
+                Console.WriteLine($"#{note.Id} [{note.CreatedAt:yyyy-MM-dd HH:mm}]");
+                Console.WriteLine($"  {note.Text}");
+                Console.WriteLine();
+            }
+        }
+
+        static void HandleDeleteNote(CommandArgs args)
+        {
+            if (args.Arguments.Count < 1 || !int.TryParse(args.Arguments[0], out var noteId))
+            {
+                Console.WriteLine("Usage: --deleteNote <noteId>");
+                return;
+            }
+
+            var (success, message) = Notes.DeleteNote(noteId);
+            Console.WriteLine(success ? $"OK: {message}" : $"Error: {message}");
+        }
+
+        static void HandleEditNote(CommandArgs args)
+        {
+            if (args.Arguments.Count < 2 || !int.TryParse(args.Arguments[0], out var noteId))
+            {
+                Console.WriteLine("Usage: --editNote <noteId> \"new text\"");
+                return;
+            }
+
+            var newText = string.Join(" ", args.Arguments.Skip(1));
+            if (string.IsNullOrWhiteSpace(newText))
+            {
+                Console.WriteLine("Usage: --editNote <noteId> \"new text\"");
+                return;
+            }
+
+            var (success, message, _) = Notes.EditNote(noteId, newText);
+            Console.WriteLine(success ? $"OK: {message}" : $"Error: {message}");
         }
     }
 }
