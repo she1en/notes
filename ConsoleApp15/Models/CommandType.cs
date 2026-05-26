@@ -22,6 +22,8 @@ namespace ConsoleApp15.Models
         AdminCreateAdmin,
         CheckUpdate,
         ApplyUpdate,
+        Interactive,
+        Exit,
         Unknown
     }
 }

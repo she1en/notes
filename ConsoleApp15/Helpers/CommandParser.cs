@@ -12,11 +12,18 @@ namespace ConsoleApp15.Helpers
 
             if (args == null || args.Length == 0)
             {
-                result.Command = CommandType.Help;
+                result.Command = CommandType.Interactive;
                 return result;
             }
 
-            result.Command = ParseCommand(args[0].ToLower());
+            var cmd = args[0].ToLower();
+            if (cmd == "--interactive" || cmd == "-i")
+            {
+                result.Command = CommandType.Interactive;
+                return result;
+            }
+
+            result.Command = ParseCommand(cmd);
 
             for (int i = 1; i < args.Length; i++)
             {
@@ -40,6 +47,57 @@ namespace ConsoleApp15.Helpers
             }
 
             return result;
+        }
+
+        public static CommandArgs ParseInteractive(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return new CommandArgs { Command = CommandType.Unknown };
+
+            var tokens = Tokenize(input);
+            if (tokens.Count == 0)
+                return new CommandArgs { Command = CommandType.Unknown };
+
+            var first = tokens[0].ToLower();
+            if (first == "exit" || first == "quit")
+                return new CommandArgs { Command = CommandType.Exit };
+
+            if (!first.StartsWith("--"))
+                tokens[0] = "--" + tokens[0];
+
+            return Parse(tokens.ToArray());
+        }
+
+        private static List<string> Tokenize(string input)
+        {
+            var tokens = new List<string>();
+            var current = "";
+            var inQuotes = false;
+
+            foreach (var ch in input)
+            {
+                if (ch == '"')
+                {
+                    inQuotes = !inQuotes;
+                }
+                else if (ch == ' ' && !inQuotes)
+                {
+                    if (!string.IsNullOrWhiteSpace(current))
+                    {
+                        tokens.Add(current);
+                        current = "";
+                    }
+                }
+                else
+                {
+                    current += ch;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(current))
+                tokens.Add(current);
+
+            return tokens;
         }
 
         private static CommandType ParseCommand(string cmd)

@@ -44,6 +44,10 @@ namespace ConsoleApp15
                         Console.WriteLine($"{AppVersion.AppName} v{AppVersion.Version}");
                         break;
 
+                    case CommandType.Interactive:
+                        RunInteractive();
+                        break;
+
                     case CommandType.Register:
                         HandleRegister(parsedArgs);
                         break;
@@ -125,6 +129,110 @@ namespace ConsoleApp15
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+
+        static void RunInteractive()
+        {
+            Console.WriteLine($"{AppVersion.AppName} v{AppVersion.Version} — interactive mode. Type 'help' or 'exit'.");
+            Console.WriteLine();
+
+            while (true)
+            {
+                var session = Auth.GetCurrentSession();
+                var prompt = session.IsActive
+                    ? $"Заметки [{session.Username}]> "
+                    : "Заметки> ";
+
+                Console.Write(prompt);
+                var input = Console.ReadLine();
+
+                if (input == null)
+                    break;
+
+                var parsedArgs = CommandParser.ParseInteractive(input);
+
+                if (parsedArgs.Command == CommandType.Exit)
+                    break;
+
+                try
+                {
+                    ExecuteCommand(parsedArgs, input);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+            }
+        }
+
+        static void ExecuteCommand(CommandArgs parsedArgs, string originalInput)
+        {
+            switch (parsedArgs.Command)
+            {
+                case CommandType.Help:
+                    HelpGenerator.ShowHelp();
+                    break;
+                case CommandType.Map:
+                    HelpGenerator.ShowMap();
+                    break;
+                case CommandType.Version:
+                    Console.WriteLine($"{AppVersion.AppName} v{AppVersion.Version}");
+                    break;
+                case CommandType.Register:
+                    HandleRegister(parsedArgs);
+                    break;
+                case CommandType.Login:
+                    HandleLogin(parsedArgs);
+                    break;
+                case CommandType.Logout:
+                    HandleLogout();
+                    break;
+                case CommandType.WhoAmI:
+                    HandleWhoAmI();
+                    break;
+                case CommandType.AddNewNote:
+                    HandleAddNote(parsedArgs);
+                    break;
+                case CommandType.ListNotes:
+                    HandleListNotes();
+                    break;
+                case CommandType.DeleteNote:
+                    HandleDeleteNote(parsedArgs);
+                    break;
+                case CommandType.EditNote:
+                    HandleEditNote(parsedArgs);
+                    break;
+                case CommandType.Stats:
+                    HandleStats();
+                    break;
+                case CommandType.StatsWatch:
+                    HandleStatsWatch(parsedArgs);
+                    break;
+                case CommandType.SecurityLogs:
+                    HandleSecurityLogs(parsedArgs);
+                    break;
+                case CommandType.AdminUsers:
+                    HandleAdminUsers();
+                    break;
+                case CommandType.AdminDeleteNote:
+                    HandleAdminDeleteNote(parsedArgs);
+                    break;
+                case CommandType.AdminDeleteUser:
+                    HandleAdminDeleteUser(parsedArgs);
+                    break;
+                case CommandType.AdminCreateAdmin:
+                    HandleAdminCreateAdmin(parsedArgs);
+                    break;
+                case CommandType.CheckUpdate:
+                    HandleCheckUpdate();
+                    break;
+                case CommandType.ApplyUpdate:
+                    HandleApplyUpdate();
+                    break;
+                default:
+                    Console.WriteLine($"Unknown command: {originalInput}");
+                    break;
             }
         }
 
