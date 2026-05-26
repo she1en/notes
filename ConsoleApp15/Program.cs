@@ -12,6 +12,7 @@ namespace ConsoleApp15
         private static readonly AuthService Auth = new AuthService();
         private static readonly NoteService Notes = new NoteService();
         private static readonly StatsService Stats = new StatsService();
+        private static readonly SecurityLogger SecLog = new SecurityLogger();
 
         static void Main(string[] args)
         {
@@ -71,6 +72,10 @@ namespace ConsoleApp15
 
                     case CommandType.StatsWatch:
                         HandleStatsWatch(parsedArgs);
+                        break;
+
+                    case CommandType.SecurityLogs:
+                        HandleSecurityLogs(parsedArgs);
                         break;
 
                     case CommandType.Unknown:
@@ -230,6 +235,42 @@ namespace ConsoleApp15
                 Console.WriteLine();
                 Thread.Sleep(interval * 1000);
             }
+        }
+
+        static void HandleSecurityLogs(CommandArgs args)
+        {
+            var session = Auth.GetCurrentSession();
+            if (!session.IsActive)
+            {
+                Console.WriteLine("Not logged in.");
+                return;
+            }
+
+            DateTime? from = null;
+            DateTime? to = null;
+            string user = null;
+
+            if (args.Flags.TryGetValue("--from", out var fromStr) && DateTime.TryParse(fromStr, out var fromDate))
+                from = fromDate;
+
+            if (args.Flags.TryGetValue("--to", out var toStr) && DateTime.TryParse(toStr, out var toDate))
+                to = toDate;
+
+            if (args.Flags.TryGetValue("--user", out var userStr))
+                user = userStr;
+
+            var logs = SecLog.ReadFiltered(from, to, user);
+
+            if (logs.Length == 0)
+            {
+                Console.WriteLine("No log entries found.");
+                return;
+            }
+
+            Console.WriteLine($"=== Security Logs ({logs.Length} entries) ===");
+            Console.WriteLine();
+            foreach (var line in logs)
+                Console.WriteLine(line);
         }
 
         static void PrintStats()

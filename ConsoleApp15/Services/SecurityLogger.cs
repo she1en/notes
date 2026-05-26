@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace ConsoleApp15.Services
 {
@@ -26,6 +28,44 @@ namespace ConsoleApp15.Services
                 return Array.Empty<string>();
 
             return File.ReadAllLines(_logPath);
+        }
+
+        public string[] ReadFiltered(DateTime? from = null, DateTime? to = null, string username = null)
+        {
+            var lines = ReadAll();
+            if (lines.Length == 0)
+                return lines;
+
+            var filtered = lines.Where(line =>
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    return false;
+
+                if (line.Length < 19)
+                    return false;
+
+                if (DateTime.TryParse(line.Substring(0, 19), out var lineDate))
+                {
+                    if (from.HasValue && lineDate < from.Value)
+                        return false;
+                    if (to.HasValue && lineDate > to.Value)
+                        return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(username))
+                {
+                    var parts = line.Split('|');
+                    if (parts.Length < 2)
+                        return false;
+                    var logUser = parts[1].Trim();
+                    if (!logUser.Equals(username, StringComparison.OrdinalIgnoreCase))
+                        return false;
+                }
+
+                return true;
+            }).ToArray();
+
+            return filtered;
         }
     }
 }
