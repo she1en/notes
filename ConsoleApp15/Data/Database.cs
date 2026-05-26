@@ -8,11 +8,12 @@ namespace ConsoleApp15.Data
     {
         private readonly string _connectionString;
 
-        public Database()
+        public Database() : this(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data")) { }
+
+        public Database(string dataDir)
         {
-            var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
-            Directory.CreateDirectory(dir);
-            var dbPath = Path.Combine(dir, "notes.db");
+            Directory.CreateDirectory(dataDir);
+            var dbPath = Path.Combine(dataDir, "notes.db");
             _connectionString = $"Data Source={dbPath};Version=3;";
             Initialize();
         }

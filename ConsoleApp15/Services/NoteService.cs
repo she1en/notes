@@ -12,11 +12,13 @@ namespace ConsoleApp15.Services
         private readonly SecurityLogger _logger;
         private readonly AuthService _auth;
 
-        public NoteService()
+        public NoteService() : this(new Database(), new AuthService()) { }
+
+        public NoteService(Database db, AuthService auth)
         {
-            _db = new Database();
+            _db = db;
             _logger = new SecurityLogger();
-            _auth = new AuthService();
+            _auth = auth;
         }
 
         private Session RequireSession()
