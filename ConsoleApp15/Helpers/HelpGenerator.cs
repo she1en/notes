@@ -20,7 +20,7 @@ namespace ConsoleApp15.Helpers
             Console.WriteLine("  --whoami                       Текущий пользователь");
             Console.WriteLine("  --addNewNote \"текст\"          Создать заметку");
             Console.WriteLine("  --listNotes                    Список заметок");
-            Console.WriteLine("  --deleteNote <id>              Удалить заметку (админ)");
+            Console.WriteLine("  --deleteNote <id>              Удалить заметку");
             Console.WriteLine("  --editNote <id> \"текст\"       Редактировать заметку");
             Console.WriteLine("  --stats                        Метрики системы");
             Console.WriteLine("  --statsWatch <сек>             Мониторинг каждые N сек");
@@ -49,7 +49,7 @@ namespace ConsoleApp15.Helpers
             Console.WriteLine("|---------|----------|--------|");
             Console.WriteLine("| `--addNewNote \"текст\"` | Создать заметку | `--addNewNote \"Новая заметка\"` |");
             Console.WriteLine("| `--listNotes` | Список заметок | `--listNotes` |");
-            Console.WriteLine("| `--deleteNote <id>` | Удалить заметку (админ) | `--deleteNote 3` |");
+            Console.WriteLine("| `--deleteNote <id>` | Удалить заметку | `--deleteNote 3` |");
             Console.WriteLine("| `--editNote <id> \"текст\"` | Редактировать | `--editNote 3 \"Новый текст\"` |");
             Console.WriteLine();
             Console.WriteLine("## Мониторинг");

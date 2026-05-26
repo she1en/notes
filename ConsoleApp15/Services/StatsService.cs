@@ -12,10 +12,12 @@ namespace ConsoleApp15.Services
         private readonly SecurityLogger _logger;
         private readonly AuthService _auth;
 
-        public StatsService()
+        public StatsService() : this(new AuthService()) { }
+
+        public StatsService(AuthService auth)
         {
             _logger = new SecurityLogger();
-            _auth = new AuthService();
+            _auth = auth;
         }
 
         private void RequireAuth()

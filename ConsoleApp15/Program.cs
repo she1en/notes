@@ -10,8 +10,8 @@ namespace ConsoleApp15
     class Program
     {
         private static readonly AuthService Auth = new AuthService();
-        private static readonly NoteService Notes = new NoteService();
-        private static readonly StatsService Stats = new StatsService();
+        private static readonly NoteService Notes = new NoteService(Auth);
+        private static readonly StatsService Stats = new StatsService(Auth);
         private static readonly SecurityLogger SecLog = new SecurityLogger();
         private static readonly UpdateService Updater = new UpdateService();
 

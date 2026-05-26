@@ -14,6 +14,8 @@ namespace ConsoleApp15.Services
 
         public NoteService() : this(new Database(), new AuthService()) { }
 
+        public NoteService(AuthService auth) : this(new Database(), auth) { }
+
         public NoteService(Database db, AuthService auth)
         {
             _db = db;
@@ -67,15 +69,22 @@ namespace ConsoleApp15.Services
         public (bool success, string message) DeleteNote(int noteId)
         {
             var session = RequireSession();
-            if (session.Role != "admin")
-                return (false, "Admin privileges required.");
 
             using var conn = _db.CreateConnection();
             conn.Open();
 
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "DELETE FROM notes WHERE Id = @id";
-            cmd.Parameters.AddWithValue("@id", noteId);
+            if (session.Role == "admin")
+            {
+                cmd.CommandText = "DELETE FROM notes WHERE Id = @id";
+                cmd.Parameters.AddWithValue("@id", noteId);
+            }
+            else
+            {
+                cmd.CommandText = "DELETE FROM notes WHERE Id = @id AND UserId = @uid";
+                cmd.Parameters.AddWithValue("@id", noteId);
+                cmd.Parameters.AddWithValue("@uid", session.UserId);
+            }
 
             var affected = cmd.ExecuteNonQuery();
             if (affected == 0)
@@ -120,8 +129,15 @@ namespace ConsoleApp15.Services
             conn.Open();
 
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT Id, UserId, Username, Text, CreatedAt, UpdatedAt FROM notes WHERE UserId = @uid ORDER BY Id DESC";
-            cmd.Parameters.AddWithValue("@uid", session.UserId);
+            if (session.Role == "admin")
+            {
+                cmd.CommandText = "SELECT Id, UserId, Username, Text, CreatedAt, UpdatedAt FROM notes ORDER BY Id DESC";
+            }
+            else
+            {
+                cmd.CommandText = "SELECT Id, UserId, Username, Text, CreatedAt, UpdatedAt FROM notes WHERE UserId = @uid ORDER BY Id DESC";
+                cmd.Parameters.AddWithValue("@uid", session.UserId);
+            }
 
             var notes = new List<Note>();
             using var reader = cmd.ExecuteReader();
