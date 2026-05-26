@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using ConsoleApp15.Helpers;
 using ConsoleApp15.Models;
 using ConsoleApp15.Services;
@@ -10,6 +11,7 @@ namespace ConsoleApp15
     {
         private static readonly AuthService Auth = new AuthService();
         private static readonly NoteService Notes = new NoteService();
+        private static readonly StatsService Stats = new StatsService();
 
         static void Main(string[] args)
         {
@@ -61,6 +63,14 @@ namespace ConsoleApp15
 
                     case CommandType.EditNote:
                         HandleEditNote(parsedArgs);
+                        break;
+
+                    case CommandType.Stats:
+                        HandleStats();
+                        break;
+
+                    case CommandType.StatsWatch:
+                        HandleStatsWatch(parsedArgs);
                         break;
 
                     case CommandType.Unknown:
@@ -195,6 +205,44 @@ namespace ConsoleApp15
 
             var (success, message, _) = Notes.EditNote(noteId, newText);
             Console.WriteLine(success ? $"OK: {message}" : $"Error: {message}");
+        }
+
+        static void HandleStats()
+        {
+            PrintStats();
+        }
+
+        static void HandleStatsWatch(CommandArgs args)
+        {
+            if (args.Arguments.Count < 1 || !int.TryParse(args.Arguments[0], out var interval) || interval < 1)
+            {
+                Console.WriteLine("Usage: --statsWatch <seconds>");
+                return;
+            }
+
+            Console.WriteLine($"Monitoring every {interval}s. Press Ctrl+C to stop.");
+            Console.WriteLine();
+
+            while (true)
+            {
+                PrintStats();
+                Console.WriteLine($"--- Next update in {interval}s ---");
+                Console.WriteLine();
+                Thread.Sleep(interval * 1000);
+            }
+        }
+
+        static void PrintStats()
+        {
+            var (cpu, ramUsed, ramTotal, ramPercent, disks) = Stats.GetStats();
+
+            Console.WriteLine($"CPU:  {cpu}%");
+            Console.WriteLine($"RAM:  {ramUsed} GB / {ramTotal} GB ({ramPercent}%)");
+
+            foreach (var (name, total, used, percent) in disks)
+            {
+                Console.WriteLine($"HDD {name}: {used} GB / {total} GB ({percent}%)");
+            }
         }
     }
 }
