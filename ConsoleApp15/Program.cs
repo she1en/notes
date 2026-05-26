@@ -13,10 +13,20 @@ namespace ConsoleApp15
         private static readonly NoteService Notes = new NoteService();
         private static readonly StatsService Stats = new StatsService();
         private static readonly SecurityLogger SecLog = new SecurityLogger();
+        private static readonly UpdateService Updater = new UpdateService();
 
         static void Main(string[] args)
         {
             var parsedArgs = CommandParser.Parse(args);
+
+            if (parsedArgs.Command != CommandType.CheckUpdate
+                && parsedArgs.Command != CommandType.ApplyUpdate
+                && parsedArgs.Command != CommandType.Version
+                && parsedArgs.Command != CommandType.Help
+                && parsedArgs.Command != CommandType.Map)
+            {
+                Updater.CheckOnStartup();
+            }
 
             try
             {
@@ -92,6 +102,14 @@ namespace ConsoleApp15
 
                     case CommandType.AdminCreateAdmin:
                         HandleAdminCreateAdmin(parsedArgs);
+                        break;
+
+                    case CommandType.CheckUpdate:
+                        HandleCheckUpdate();
+                        break;
+
+                    case CommandType.ApplyUpdate:
+                        HandleApplyUpdate();
                         break;
 
                     case CommandType.Unknown:
@@ -402,6 +420,38 @@ namespace ConsoleApp15
             Console.WriteLine();
             foreach (var line in logs)
                 Console.WriteLine(line);
+        }
+
+        static void HandleCheckUpdate()
+        {
+            Console.WriteLine("Checking for updates...");
+            var (available, version, _) = Updater.CheckForUpdates();
+
+            if (!available)
+                Console.WriteLine("You have the latest version.");
+            else
+                Console.WriteLine($"Update available: v{version}. Run --applyUpdate to install.");
+        }
+
+        static void HandleApplyUpdate()
+        {
+            var session = Auth.GetCurrentSession();
+            if (!session.IsActive)
+            {
+                Console.WriteLine("Not logged in.");
+                return;
+            }
+
+            var (available, version, url) = Updater.CheckForUpdates();
+            if (!available)
+            {
+                Console.WriteLine("No updates available.");
+                return;
+            }
+
+            Console.WriteLine($"Downloading v{version}...");
+            var (success, message) = Updater.ApplyUpdate(url);
+            Console.WriteLine(success ? $"OK: {message}" : $"Error: {message}");
         }
 
         static void PrintStats()
