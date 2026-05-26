@@ -12,6 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleApp15\ConsoleApp15.csproj" />
+    <ProjectReference Include="..\ConsoleApp15.csproj" />
   </ItemGroup>
 </Project>
