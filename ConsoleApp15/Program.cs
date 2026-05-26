@@ -78,6 +78,22 @@ namespace ConsoleApp15
                         HandleSecurityLogs(parsedArgs);
                         break;
 
+                    case CommandType.AdminUsers:
+                        HandleAdminUsers();
+                        break;
+
+                    case CommandType.AdminDeleteNote:
+                        HandleAdminDeleteNote(parsedArgs);
+                        break;
+
+                    case CommandType.AdminDeleteUser:
+                        HandleAdminDeleteUser(parsedArgs);
+                        break;
+
+                    case CommandType.AdminCreateAdmin:
+                        HandleAdminCreateAdmin(parsedArgs);
+                        break;
+
                     case CommandType.Unknown:
                         Console.WriteLine($"Unknown command: {string.Join(" ", args)}");
                         Console.WriteLine("Use --help to see available commands.");
@@ -235,6 +251,93 @@ namespace ConsoleApp15
                 Console.WriteLine();
                 Thread.Sleep(interval * 1000);
             }
+        }
+
+        static void HandleAdminUsers()
+        {
+            var session = Auth.GetCurrentSession();
+            if (!session.IsActive || session.Role != "admin")
+            {
+                Console.WriteLine("Admin privileges required.");
+                return;
+            }
+
+            var users = Auth.GetAllUsers();
+            Console.WriteLine($"=== Users ({users.Count}) ===");
+            Console.WriteLine();
+            foreach (var u in users)
+                Console.WriteLine($"#{u.Id} | {u.Username} | {u.Role} | {u.CreatedAt:yyyy-MM-dd HH:mm}");
+        }
+
+        static void HandleAdminDeleteNote(CommandArgs args)
+        {
+            var session = Auth.GetCurrentSession();
+            if (!session.IsActive || session.Role != "admin")
+            {
+                Console.WriteLine("Admin privileges required.");
+                return;
+            }
+
+            if (args.Arguments.Count < 2 || !int.TryParse(args.Arguments[1], out var noteId))
+            {
+                Console.WriteLine("Usage: --adminDeleteNote <userId> <noteId>");
+                return;
+            }
+
+            var (success, message) = Notes.AdminDeleteNote(noteId);
+            Console.WriteLine(success ? $"OK: {message}" : $"Error: {message}");
+        }
+
+        static void HandleAdminDeleteUser(CommandArgs args)
+        {
+            var session = Auth.GetCurrentSession();
+            if (!session.IsActive || session.Role != "admin")
+            {
+                Console.WriteLine("Admin privileges required.");
+                return;
+            }
+
+            if (args.Arguments.Count < 1 || !int.TryParse(args.Arguments[0], out var userId))
+            {
+                Console.WriteLine("Usage: --adminDeleteUser <userId>");
+                return;
+            }
+
+            if (userId == session.UserId)
+            {
+                Console.WriteLine("Cannot delete yourself.");
+                return;
+            }
+
+            Auth.DeleteUser(userId);
+            Console.WriteLine($"User #{userId} deleted.");
+        }
+
+        static void HandleAdminCreateAdmin(CommandArgs args)
+        {
+            var session = Auth.GetCurrentSession();
+            if (!session.IsActive || session.Role != "admin")
+            {
+                Console.WriteLine("Admin privileges required.");
+                return;
+            }
+
+            if (args.Arguments.Count < 1)
+            {
+                Console.WriteLine("Usage: --adminCreateAdmin <username>");
+                return;
+            }
+
+            var user = Auth.GetUser(args.Arguments[0]);
+            if (user == null)
+            {
+                Console.WriteLine($"User '{args.Arguments[0]}' not found.");
+                return;
+            }
+
+            user.Role = "admin";
+            Auth.UpdateUser(user);
+            Console.WriteLine($"User '{user.Username}' is now admin.");
         }
 
         static void HandleSecurityLogs(CommandArgs args)

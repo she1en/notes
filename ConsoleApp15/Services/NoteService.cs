@@ -97,6 +97,26 @@ namespace ConsoleApp15.Services
             return (true, $"Note #{noteId} updated.", note);
         }
 
+        public (bool success, string message) AdminDeleteNote(int noteId)
+        {
+            var session = RequireSession();
+            if (session.Role != "admin")
+                return (false, "Admin privileges required.");
+
+            var notes = _noteStore.Load();
+            var note = notes.FirstOrDefault(n => n.Id == noteId);
+
+            if (note == null)
+                return (false, $"Note #{noteId} not found.");
+
+            notes.Remove(note);
+            _noteStore.Save(notes);
+
+            _logger.Log(session.Username, "adminDeleteNote", "success",
+                $"noteId={noteId}, owner={note.Username}");
+            return (true, $"Note #{noteId} deleted by admin.");
+        }
+
         public (List<Note> notes, string message) ListNotes()
         {
             var session = RequireSession();

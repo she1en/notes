@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using ConsoleApp15.Data;
@@ -95,6 +96,11 @@ namespace ConsoleApp15.Services
         public Session GetCurrentSession()
         {
             return _sessionService.GetCurrent();
+        }
+
+        public List<User> GetAllUsers()
+        {
+            return _userStore.Load();
         }
 
         public User GetUser(string username)
