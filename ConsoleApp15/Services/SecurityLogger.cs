@@ -30,6 +30,12 @@ namespace ConsoleApp15.Services
             return File.ReadAllLines(_logPath);
         }
 
+        public void Clear()
+        {
+            if (File.Exists(_logPath))
+                File.WriteAllText(_logPath, "");
+        }
+
         public string[] ReadFiltered(DateTime? from = null, DateTime? to = null, string username = null)
         {
             var lines = ReadAll();

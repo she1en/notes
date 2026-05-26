@@ -246,6 +246,18 @@ namespace ConsoleApp15
                 return;
             }
 
+            if (args.Flags.ContainsKey("--clear"))
+            {
+                if (session.Role != "admin")
+                {
+                    Console.WriteLine("Only admin can clear logs.");
+                    return;
+                }
+                SecLog.Clear();
+                Console.WriteLine("Security logs cleared.");
+                return;
+            }
+
             DateTime? from = null;
             DateTime? to = null;
             string user = null;
@@ -260,6 +272,22 @@ namespace ConsoleApp15
                 user = userStr;
 
             var logs = SecLog.ReadFiltered(from, to, user);
+
+            if (args.Flags.ContainsKey("--stats"))
+            {
+                var stats = logs.GroupBy(l =>
+                {
+                    var parts = l.Split('|');
+                    return parts.Length >= 3 ? parts[2].Trim() : "unknown";
+                }).OrderByDescending(g => g.Count());
+
+                Console.WriteLine($"=== Log Stats ({logs.Length} total entries) ===");
+                Console.WriteLine();
+                foreach (var group in stats)
+                    Console.WriteLine($"  {group.Key,-20} {group.Count()}");
+
+                return;
+            }
 
             if (logs.Length == 0)
             {
