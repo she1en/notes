@@ -28,6 +28,8 @@ namespace ConsoleApp15.Services
             var session = _auth.GetCurrentSession();
             if (!session.IsActive)
                 throw new InvalidOperationException("Not logged in. Use --login first.");
+            if (session.Role == "watcher")
+                throw new InvalidOperationException("Watcher role cannot manage notes.");
             return session;
         }
 

@@ -20,6 +20,7 @@ namespace ConsoleApp15.Models
 
         AdminDeleteUser,
         AdminCreateAdmin,
+        SetRole,
         CheckUpdate,
         ApplyUpdate,
         Interactive,

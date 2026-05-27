@@ -121,6 +121,7 @@ namespace ConsoleApp15.Helpers
                 "--adminusers" => CommandType.AdminUsers,
                 "--admindeleteuser" => CommandType.AdminDeleteUser,
                 "--admincreateadmin" => CommandType.AdminCreateAdmin,
+                "--setrole" => CommandType.SetRole,
                 "--checkupdate" => CommandType.CheckUpdate,
                 "--applyupdate" => CommandType.ApplyUpdate,
                 _ => CommandType.Unknown

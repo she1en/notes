@@ -104,6 +104,10 @@ namespace ConsoleApp15
                         HandleAdminCreateAdmin(parsedArgs);
                         break;
 
+                    case CommandType.SetRole:
+                        HandleSetRole(parsedArgs);
+                        break;
+
                     case CommandType.CheckUpdate:
                         HandleCheckUpdate();
                         break;
@@ -216,6 +220,9 @@ namespace ConsoleApp15
                     break;
                 case CommandType.AdminCreateAdmin:
                     HandleAdminCreateAdmin(parsedArgs);
+                    break;
+                case CommandType.SetRole:
+                    HandleSetRole(parsedArgs);
                     break;
                 case CommandType.CheckUpdate:
                     HandleCheckUpdate();
@@ -438,6 +445,41 @@ namespace ConsoleApp15
             user.Role = "admin";
             Auth.UpdateUser(user);
             Console.WriteLine($"User '{user.Username}' is now admin.");
+        }
+
+        static void HandleSetRole(CommandArgs args)
+        {
+            var session = Auth.GetCurrentSession();
+            if (!session.IsActive || session.Role != "admin")
+            {
+                Console.WriteLine("Admin privileges required.");
+                return;
+            }
+
+            if (args.Arguments.Count < 2)
+            {
+                Console.WriteLine("Usage: --setRole <username> <role>");
+                Console.WriteLine("Roles: admin, watcher, user");
+                return;
+            }
+
+            var role = args.Arguments[1].ToLower();
+            if (role != "admin" && role != "watcher" && role != "user")
+            {
+                Console.WriteLine("Invalid role. Use: admin, watcher, user");
+                return;
+            }
+
+            var user = Auth.GetUser(args.Arguments[0]);
+            if (user == null)
+            {
+                Console.WriteLine($"User '{args.Arguments[0]}' not found.");
+                return;
+            }
+
+            user.Role = role;
+            Auth.UpdateUser(user);
+            Console.WriteLine($"User '{user.Username}' is now {role}.");
         }
 
         static void HandleSecurityLogs(CommandArgs args)

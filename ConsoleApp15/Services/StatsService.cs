@@ -25,6 +25,8 @@ namespace ConsoleApp15.Services
             var session = _auth.GetCurrentSession();
             if (!session.IsActive)
                 throw new InvalidOperationException("Not logged in. Use --login first.");
+            if (session.Role != "admin" && session.Role != "watcher")
+                throw new InvalidOperationException("Admin or watcher role required for monitoring.");
         }
 
         public (double cpu, double ramUsedGb, double ramTotalGb, double ramPercent,

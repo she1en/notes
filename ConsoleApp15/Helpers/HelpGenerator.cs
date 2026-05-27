@@ -22,12 +22,13 @@ namespace ConsoleApp15.Helpers
             Console.WriteLine("  --listNotes                    Список заметок");
             Console.WriteLine("  --deleteNote <id>              Удалить заметку");
             Console.WriteLine("  --editNote <id> \"текст\"       Редактировать заметку");
-            Console.WriteLine("  --stats                        Метрики системы");
-            Console.WriteLine("  --statsWatch <сек>             Мониторинг каждые N сек");
+            Console.WriteLine("  --stats                        Метрики системы (админ/watcher)");
+            Console.WriteLine("  --statsWatch <сек>             Мониторинг каждые N сек (админ/watcher)");
             Console.WriteLine("  --securityLogs                 Логи безопасности");
             Console.WriteLine("  --adminUsers                   Список пользователей (админ)");
             Console.WriteLine("  --adminDeleteUser <uid>        Удалить пользователя (админ)");
             Console.WriteLine("  --adminCreateAdmin <user>      Назначить админа (админ)");
+            Console.WriteLine("  --setRole <user> <role>         Установить роль (админ)");
             Console.WriteLine("  --checkUpdate                  Проверить обновления");
             Console.WriteLine("  --applyUpdate                  Применить обновление");
         }
@@ -70,6 +71,7 @@ namespace ConsoleApp15.Helpers
             Console.WriteLine("| `--adminUsers` | Список пользователей | `--adminUsers` |");
             Console.WriteLine("| `--adminDeleteUser <uid>` | Удалить пользователя | `--adminDeleteUser 3` |");
             Console.WriteLine("| `--adminCreateAdmin <user>` | Назначить админом | `--adminCreateAdmin bob` |");
+            Console.WriteLine("| `--setRole <user> <role>` | Установить роль (admin/watcher/user) | `--setRole bob watcher` |");
             Console.WriteLine();
             Console.WriteLine("## Обновления");
             Console.WriteLine("| Команда | Описание | Пример |");
